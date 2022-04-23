@@ -1,0 +1,12 @@
+domain: sustainablecomputing.io
+layout:
+- quarkus.javaoperatorsdk.io/v1-alpha
+projectName: kepler-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  domain: sustainablecomputing.io
+  kind: Kepler
+  version: v1alpha1
+version: "3"

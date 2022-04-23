@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kepler-exporter
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: kepler-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: kepler-exporter
+    spec:
+      hostNetwork: true
+      serviceAccountName: kepler-sa
+      containers:
+        - name: kepler-exporter
+          image: quay.io/sustainable_computing_io/kepler:latest
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          command:
+            - /usr/bin/kepler
+            - -address
+            - 0.0.0.0:9102
+          ports:
+            - containerPort: 9102
+              hostPort: 9102
+              name: http
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: lib-modules
+            - mountPath: /sys
+              name: tracing
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+      volumes:
+        - name: lib-modules
+          hostPath:
+            path: /lib/modules
+            type: Directory
+        - name: tracing
+          hostPath:
+            path: /sys
+            type: Directory
